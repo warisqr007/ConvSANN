@@ -7,12 +7,14 @@ from models.multihead_attention import MultiheadAttentionSiameseNet
 class ModelType(Enum):
     multihead = 0,
     rnn = 1,
-    cnn = 2
+    cnn = 2,
+    bcann = 3
 
 
 MODELS = {
     ModelType.cnn.name: CnnSiameseNet,
     ModelType.rnn.name: LSTMBasedSiameseNet,
-    ModelType.multihead.name: MultiheadAttentionSiameseNet
+    ModelType.multihead.name: MultiheadAttentionSiameseNet,
+    ModelType.bcann.name: BCANN
 }
 

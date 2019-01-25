@@ -15,6 +15,6 @@ MODELS = {
     ModelType.cnn.name: CnnSiameseNet,
     ModelType.rnn.name: LSTMBasedSiameseNet,
     ModelType.multihead.name: MultiheadAttentionSiameseNet,
-    ModelType.bcann.name: BCANN
+    ModelType.bcann.name: BConvolutionAttentionNN
 }
 

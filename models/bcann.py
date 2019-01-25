@@ -41,7 +41,7 @@ class AttentionCnn(BaseSiameseNet):
             self._beta = tf.matmul(self._masked_softmax(e, sequence_len), self._X2_conv, name='beta2')
             self._alpha = tf.matmul(self._masked_softmax(tf.transpose(e, [0,2,1]), sequence_len), self._X1_conv, name='alpha2')
             
-    def siamese_layer():
+    def siamese_layer(self, sequence_len, model_cfg):
         with tf.name_scope('convolutional_layer'):
             X1_conv_1 = tf.layers.conv1d(
                 #self._conv_pad(self.conc_X1),

@@ -9,13 +9,13 @@ import tensorflow as tf
 _conv_projection_size = 300
 _attention_output_size = 200
 _comparison_output_size = 100
+_conv_filter_size = parse_list(model_cfg['PARAMS']['filter_sizes'])
 
 class AttentionCnn(BaseSiameseNet):
 
     def __init__(self, max_sequence_len, vocabulary_size, main_cfg, model_cfg):
         BaseSiameseNet.__init__(self, max_sequence_len, vocabulary_size, main_cfg, model_cfg, mse)
-        self._conv_filter_size = parse_list(model_cfg['PARAMS']['filter_sizes'])
-        
+          
         
     def _masked_softmax(self, values, lengths):
         with tf.name_scope('MaskedSoftmax'):

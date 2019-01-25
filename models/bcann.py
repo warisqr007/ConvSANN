@@ -48,7 +48,7 @@ class AttentionCnn(BaseSiameseNet):
             X1_conv_1 = tf.layers.conv1d(
                 self._conv_pad(self.embedded_x1),
                 _conv_projection_size,
-                self._conv_filter_size,
+                _conv_filter_size,
                 padding='valid',
                 use_bias=False,
                 name='conv_1',
@@ -57,7 +57,7 @@ class AttentionCnn(BaseSiameseNet):
             X2_conv_1 = tf.layers.conv1d(
                 self._conv_pad(self.embedded_x2),
                 _conv_projection_size,
-                self._conv_filter_size,
+                _conv_filter_size,
                 padding='valid',
                 use_bias=False,
                 name='conv_1',
@@ -70,7 +70,7 @@ class AttentionCnn(BaseSiameseNet):
             X1_conv_2 = tf.layers.conv1d(
                 self._conv_pad(X1_conv_1),
                 _conv_projection_size,
-                self._conv_filter_size,
+                _conv_filter_size,
                 padding='valid',
                 use_bias=False,
                 name='conv_2',
@@ -79,7 +79,7 @@ class AttentionCnn(BaseSiameseNet):
             X2_conv_2 = tf.layers.conv1d(
                 self._conv_pad(X2_conv_1),
                 _conv_projection_size,
-                self._conv_filter_size,
+                _conv_filter_size,
                 padding='valid',
                 use_bias=False,
                 name='conv_2',

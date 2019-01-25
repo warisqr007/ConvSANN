@@ -26,7 +26,7 @@ class AttentionCnn(BaseSiameseNet):
         
     def _conv_pad(self, values):
         with tf.name_scope('convolutional_padding'):
-            pad = tf.zeros([tf.shape(self.X1)[0], 1, self.embedding_size[1]])
+            pad = tf.zeros([tf.shape(self.x1)[0], 1, self.embedding_size[1]])
             return tf.concat([pad, values, pad], axis=1)
         
 
@@ -45,7 +45,7 @@ class AttentionCnn(BaseSiameseNet):
         with tf.name_scope('convolutional_layer'):
             X1_conv_1 = tf.layers.conv1d(
                 #self._conv_pad(self.conc_X1),
-                self._conv_pad(self._X1_embedded),
+                self._conv_pad(self.embedded_x1),
                 self._conv_projection_size,
                 self._conv_filter_size,
                 padding='valid',
@@ -55,7 +55,7 @@ class AttentionCnn(BaseSiameseNet):
             
             X2_conv_1 = tf.layers.conv1d(
                 #self._conv_pad(self.conc_X2),
-                self._conv_pad(self._X2_embedded),
+                self._conv_pad(self.embedded_x2),
                 self._conv_projection_size,
                 self._conv_filter_size,
                 padding='valid',

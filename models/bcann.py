@@ -6,14 +6,16 @@ from utils.config_helpers import parse_list
 from layers.basics import dropout
 import tensorflow as tf
 
+_conv_projection_size = 300
+_attention_output_size = 200
+_comparison_output_size = 100
+
 class AttentionCnn(BaseSiameseNet):
 
     def __init__(self, max_sequence_len, vocabulary_size, main_cfg, model_cfg):
         BaseSiameseNet.__init__(self, max_sequence_len, vocabulary_size, main_cfg, model_cfg, mse)
         self._conv_filter_size = parse_list(model_cfg['PARAMS']['filter_sizes'])
-        self._conv_projection_size = 300
-        self._attention_output_size = 200
-        self._comparison_output_size = 100
+        
         
     def _masked_softmax(self, values, lengths):
         with tf.name_scope('MaskedSoftmax'):
@@ -32,8 +34,8 @@ class AttentionCnn(BaseSiameseNet):
 
     def _attention_layer(self):
         with tf.name_scope('attention_layer'):
-            e_X1 = tf.layers.dense(self._X1_conv, self._attention_output_size, activation=tf.nn.relu, name='attention_nn')
-            e_X2=tf.layers.dense(self._X2_conv,self._attention_output_size,activation=tf.nn.relu,
+            e_X1 = tf.layers.dense(self._X1_conv, _attention_output_size, activation=tf.nn.relu, name='attention_nn')
+            e_X2=tf.layers.dense(self._X2_conv, _attention_output_size, activation=tf.nn.relu,
                                  name='attention_nn',reuse=True)
             
             e = tf.matmul(e_X1, e_X2, transpose_b=True, name='e')
@@ -44,9 +46,8 @@ class AttentionCnn(BaseSiameseNet):
     def siamese_layer(self, sequence_len, model_cfg):
         with tf.name_scope('convolutional_layer'):
             X1_conv_1 = tf.layers.conv1d(
-                #self._conv_pad(self.conc_X1),
                 self._conv_pad(self.embedded_x1),
-                self._conv_projection_size,
+                _conv_projection_size,
                 self._conv_filter_size,
                 padding='valid',
                 use_bias=False,
@@ -54,9 +55,8 @@ class AttentionCnn(BaseSiameseNet):
             )
             
             X2_conv_1 = tf.layers.conv1d(
-                #self._conv_pad(self.conc_X2),
                 self._conv_pad(self.embedded_x2),
-                self._conv_projection_size,
+                _conv_projection_size,
                 self._conv_filter_size,
                 padding='valid',
                 use_bias=False,
@@ -69,7 +69,7 @@ class AttentionCnn(BaseSiameseNet):
             
             X1_conv_2 = tf.layers.conv1d(
                 self._conv_pad(X1_conv_1),
-                self._conv_projection_size,
+                _conv_projection_size,
                 self._conv_filter_size,
                 padding='valid',
                 use_bias=False,
@@ -78,7 +78,7 @@ class AttentionCnn(BaseSiameseNet):
             
             X2_conv_2 = tf.layers.conv1d(
                 self._conv_pad(X2_conv_1),
-                self._conv_projection_size,
+                _conv_projection_size,
                 self._conv_filter_size,
                 padding='valid',
                 use_bias=False,
@@ -90,9 +90,9 @@ class AttentionCnn(BaseSiameseNet):
             self._X2_conv = tf.layers.dropout(X2_conv_2, rate=self.dropout, training=self.is_training)
             
         with tf.name_scope('attention_layer'):
-            e_X1 = tf.layers.dense(self._X1_conv, self._attention_output_size, activation=tf.nn.relu, name='attention_nn')
+            e_X1 = tf.layers.dense(self._X1_conv, _attention_output_size, activation=tf.nn.relu, name='attention_nn')
             
-            e_X2 = tf.layers.dense(self._X2_conv, self._attention_output_size, activation=tf.nn.relu, name='attention_nn', reuse=True)
+            e_X2 = tf.layers.dense(self._X2_conv, _attention_output_size, activation=tf.nn.relu, name='attention_nn', reuse=True)
             
             e = tf.matmul(e_X1, e_X2, transpose_b=True, name='e')
             
@@ -102,7 +102,7 @@ class AttentionCnn(BaseSiameseNet):
         with tf.name_scope('comparison_layer'):
             X1_comp = tf.layers.dense(
                 tf.concat([self._X1_conv, self._beta], 2),
-                self._comparison_output_size,
+                _comparison_output_size,
                 activation=tf.nn.relu,
                 name='comparison_nn'
             )
@@ -113,7 +113,7 @@ class AttentionCnn(BaseSiameseNet):
             
             X2_comp = tf.layers.dense(
                 tf.concat([self._X2_conv, self._alpha], 2),
-                self._comparison_output_size,
+                _comparison_output_size,
                 activation=tf.nn.relu,
                 name='comparison_nn',
                 reuse=True

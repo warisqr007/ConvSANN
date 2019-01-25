@@ -9,7 +9,6 @@ import tensorflow as tf
 _conv_projection_size = 300
 _attention_output_size = 200
 _comparison_output_size = 100
-_conv_filter_size = parse_list(model_cfg['PARAMS']['filter_sizes'])
 
 class AttentionCnn(BaseSiameseNet):
 
@@ -44,6 +43,7 @@ class AttentionCnn(BaseSiameseNet):
             self._alpha = tf.matmul(self._masked_softmax(tf.transpose(e, [0,2,1]), sequence_len), self._X1_conv, name='alpha2')
             
     def siamese_layer(self, sequence_len, model_cfg):
+        _conv_filter_size = parse_list(model_cfg['PARAMS']['filter_sizes'])
         with tf.name_scope('convolutional_layer'):
             X1_conv_1 = tf.layers.conv1d(
                 self._conv_pad(self.embedded_x1),

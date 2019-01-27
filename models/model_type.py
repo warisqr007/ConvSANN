@@ -18,6 +18,6 @@ MODELS = {
     ModelType.rnn.name: LSTMBasedSiameseNet,
     ModelType.multihead.name: MultiheadAttentionSiameseNet,
     ModelType.bcann.name: AttentionCnn,
-    ModelType.bcsann.name:AttentionSCnn
+    ModelType.bcsann.name: AttentionSCnn
 }
 

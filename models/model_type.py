@@ -3,6 +3,7 @@ from models.cnn import CnnSiameseNet
 from models.lstm import LSTMBasedSiameseNet
 from models.multihead_attention import MultiheadAttentionSiameseNet
 from models.bcann import AttentionCnn
+from models.bcsann import AttentionSCnn
 
 
 class ModelType(Enum):

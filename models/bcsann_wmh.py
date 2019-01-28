@@ -98,13 +98,13 @@ class AttentionSCnnWMH(BaseSiameseNet):
             self._X2_conv = tf.layers.dropout(X2_conv_2, rate=self.dropout, training=self.is_training)
             
             self._beta1,_=stacked_multihead_attention(self.embedded_x1,
-                                                       num_blocks=1,
-                                                       num_heads=4,
+                                                       num_blocks=2,
+                                                       num_heads=2,
                                                        use_residual=False,
                                                        is_training=self.is_training)
             self._alpha1,_ =stacked_multihead_attention(self.embedded_x1,
-                                                       num_blocks=1,
-                                                       num_heads=4,
+                                                       num_blocks=2,
+                                                       num_heads=2,
                                                        use_residual=False,
                                                        is_training=self.is_training,reuse=True)
 

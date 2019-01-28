@@ -4,7 +4,7 @@ from models.lstm import LSTMBasedSiameseNet
 from models.multihead_attention import MultiheadAttentionSiameseNet
 from models.bcann import AttentionCnn
 from models.bcsann import AttentionSCnn
-from models.bcsann_wmh import AttentionSCnnWMA 
+from models.bcsann_wmh import AttentionSCnnWMH 
 
 
 class ModelType(Enum):
@@ -22,6 +22,6 @@ MODELS = {
     ModelType.multihead.name: MultiheadAttentionSiameseNet,
     ModelType.bcann.name: AttentionCnn,
     ModelType.bcsann.name: AttentionSCnn,
-    ModelType.bcsannwmh.name: AttentionSCnnWMA
+    ModelType.bcsannwmh.name: AttentionSCnnWMH
 }
 

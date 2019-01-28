@@ -11,7 +11,8 @@ class ModelType(Enum):
     rnn = 1,
     cnn = 2,
     bcann = 3,
-    bcsann = 4
+    bcsann = 4,
+    bcsannwmh = 5
 
 
 MODELS = {
@@ -19,6 +20,7 @@ MODELS = {
     ModelType.rnn.name: LSTMBasedSiameseNet,
     ModelType.multihead.name: MultiheadAttentionSiameseNet,
     ModelType.bcann.name: AttentionCnn,
-    ModelType.bcsann.name: AttentionSCnn
+    ModelType.bcsann.name: AttentionSCnn,
+    ModelType.bcsannwmh.name: AttentionSCnnWMH
 }
 

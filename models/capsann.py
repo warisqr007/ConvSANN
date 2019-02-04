@@ -1,4 +1,4 @@
-from network import baseline_model_kimcnn, baseline_model_cnn, capsule_model_A, capsule_model_B
+from models.network import baseline_model_kimcnn, baseline_model_cnn, capsule_model_A, capsule_model_B
 from layers.convolution import cnn_layers
 from layers.losses import mse
 from layers.similarity import manhattan_similarity

@@ -1,7 +1,7 @@
 import tensorflow as tf
 import keras
 from keras import backend as K
-from utils import _conv2d_wrapper, _get_weights_wrapper
+from models.utils import _conv2d_wrapper, _get_weights_wrapper
 
 def softmax(x, axis=-1):
     ex = K.exp(x - K.max(x, axis=axis, keepdims=True))

@@ -1,8 +1,8 @@
 from __future__ import division, print_function, unicode_literals
 import tensorflow as tf
 from keras import backend as K
-from utils import _conv2d_wrapper
-from layer import capsules_init, capsule_flatten, capsule_conv_layer, capsule_fc_layer
+from models.utils import _conv2d_wrapper
+from models.layer import capsules_init, capsule_flatten, capsule_conv_layer, capsule_fc_layer
 import tensorflow.contrib.slim as slim
 
 def baseline_model_cnn(X, num_classes):

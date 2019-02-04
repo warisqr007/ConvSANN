@@ -48,9 +48,10 @@ class AttentionSCapnn(BaseSiameseNet):
         _conv_filter_size = 3
         #parse_list(model_cfg['PARAMS']['filter_sizes'])
         with tf.name_scope('capsule_layer'):
+            self.embedded_x1 = tf.expand_dims(embedded_x1, 0)
+            self.embedded_x2 = tf.expand_dims(embedded_x2, 0)
             self._X1_caps, activations1 = capsule_model_B(self.embedded_x1, 3)
-            self._X2_caps, activations2 = capsule_model_B(self.embedded_x1, 3)
-            
+            self._X2_caps, activations2 = capsule_model_B(self.embedded_x2, 3)
             
             '''
             X1_conv_1 = tf.layers.conv1d(

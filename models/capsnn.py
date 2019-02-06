@@ -1,8 +1,9 @@
-from models.network import baseline_model_kimcnn, baseline_model_cnn, capsule_model_A, capsule_model_B
+from keras.layers import LeakyReLU, Dense, Input, Embedding, Dropout, Bidirectional, GRU, Flatten, SpatialDropout1D
 from layers.convolution import cnn_layers
 from layers.losses import mse
 from layers.similarity import manhattan_similarity
 from models.base_model import BaseSiameseNet
+from models.Capsule_Keras import *
 from utils.config_helpers import parse_list
 from layers.basics import dropout
 import tensorflow as tf
@@ -11,6 +12,13 @@ import numpy as np
 _conv_projection_size = 64
 _attention_output_size = 200
 _comparison_output_size = 120
+
+gru_len = 256
+Routings = 3
+Num_capsule = 10
+Dim_capsule = 16
+dropout_p = 0.25
+rate_drop_dense = 0.28
 
 class AttentionCapsnn(BaseSiameseNet):
 
@@ -48,10 +56,34 @@ class AttentionCapsnn(BaseSiameseNet):
         _conv_filter_size = 3
         #parse_list(model_cfg['PARAMS']['filter_sizes'])
         with tf.name_scope('capsule_layer'): 
-            self.embedded_x1 = self.embedded_x1[...,tf.newaxis] 
-            self.embedded_x2 = self.embedded_x2[...,tf.newaxis]
-            self._X1_caps, activations1 = capsule_model_B(self.embedded_x1, 3)
-            self._X2_caps, activations2 = capsule_model_B(self.embedded_x2, 3)
+            #self.embedded_x1 = self.embedded_x1[...,tf.newaxis] 
+            #self.embedded_x2 = self.embedded_x2[...,tf.newaxis]
+            #self._X1_caps, activations1 = capsule_model_B(self.embedded_x1, 3)
+            #self._X2_caps, activations2 = capsule_model_B(self.embedded_x2, 3)
+            
+            x1 = Bidirectional(GRU(gru_len,
+                          activation='relu',
+                          dropout=dropout_p,
+                          recurrent_dropout=dropout_p,
+                          return_sequences=True))(self.embedded_x1)
+            self._X1_caps = Capsule(num_capsule=Num_capsule,
+                                    dim_capsule=Dim_capsule,
+                                    routings=Routings,
+                                    share_weights=True)(x1)
+
+            #self._X1_caps = Flatten()(self._X1_caps)
+            #self._X1_caps = Dropout(dropout_p)(self._X1_caps)
+            #self._X1_caps = LeakyReLU()(self._X1_caps)
+            
+            x2 = Bidirectional(GRU(gru_len,
+                          activation='relu',
+                          dropout=dropout_p,
+                          recurrent_dropout=dropout_p,
+                          return_sequences=True))(self.embedded_x2)
+            self._X2_caps = Capsule(num_capsule=Num_capsule,
+                                    dim_capsule=Dim_capsule,
+                                    routings=Routings,
+                                    share_weights=True)(x2)
             
             '''
             X1_conv_1 = tf.layers.conv1d(

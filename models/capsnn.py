@@ -71,9 +71,9 @@ class AttentionCapsnn(BaseSiameseNet):
                                     routings=Routings,
                                     share_weights=True)(x1)
 
-            #self._X1_caps = Flatten()(self._X1_caps)
-            #self._X1_caps = Dropout(dropout_p)(self._X1_caps)
-            #self._X1_caps = LeakyReLU()(self._X1_caps)
+            self._X1_caps = Flatten()(self._X1_caps)
+            self._X1_caps = Dropout(dropout_p)(self._X1_caps)
+            self._X1_caps = LeakyReLU()(self._X1_caps)
             
             x2 = Bidirectional(GRU(gru_len,
                           activation='relu',
@@ -84,6 +84,10 @@ class AttentionCapsnn(BaseSiameseNet):
                                     dim_capsule=Dim_capsule,
                                     routings=Routings,
                                     share_weights=True)(x2)
+            
+            self._X2_caps = Flatten()(self._X2_caps)
+            self._X2_caps = Dropout(dropout_p)(self._X2_caps)
+            self._X2_caps = LeakyReLU()(self._X2_caps)
             
             '''
             X1_conv_1 = tf.layers.conv1d(

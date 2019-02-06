@@ -149,7 +149,7 @@ def main():
                         help='pipeline mode')
 
     parser.add_argument('model',
-                        choices=['rnn', 'cnn', 'multihead', 'bcann', 'bcsann', 'bcsannwmh', 'twolayerbcnn', 'capsann'],
+                        choices=['rnn', 'cnn', 'multihead', 'bcann', 'bcsann', 'bcsannwmh', 'twolayerbcnn', 'capsann', 'capsnn'],
                         help='model to be used')
 
     parser.add_argument('dataset',

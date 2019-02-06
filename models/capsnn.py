@@ -1,4 +1,5 @@
 from keras.layers import LeakyReLU, Dense, Input, Embedding, Dropout, Bidirectional, GRU, Flatten, SpatialDropout1D
+from keras import backend as K
 from layers.convolution import cnn_layers
 from layers.losses import mse
 from layers.similarity import manhattan_similarity
@@ -136,15 +137,19 @@ class AttentionCapsnn(BaseSiameseNet):
             '''
             
         with tf.name_scope('attention_layer'):
-            e_X1 = tf.layers.dense(self._X1_caps, _attention_output_size, activation=tf.nn.relu, name='attention_nn')
+            #e_X1 = tf.layers.dense(self._X1_caps, _attention_output_size, activation=tf.nn.relu, name='attention_nn')
+            e_X1 = Lambda(lambda x: K.sqrt(K.sum(K.square(x), 2)), output_shape=(_attention_output_size,))(self._X1_caps)
             
-            e_X2 = tf.layers.dense(self._X2_caps, _attention_output_size, activation=tf.nn.relu, name='attention_nn', reuse=True)
+            #e_X2 = tf.layers.dense(self._X2_caps, _attention_output_size, activation=tf.nn.relu, name='attention_nn', reuse=True)
+            
+            e_X2 = Lambda(lambda x: K.sqrt(K.sum(K.square(x), 2)), output_shape=(_attention_output_size,))(self._X2_caps)
             
             e = tf.matmul(e_X1, e_X2, transpose_b=True, name='e')
             
             self._beta = tf.matmul(self._masked_softmax(e, sequence_len), self._X2_conv, name='beta2')
             self._alpha = tf.matmul(self._masked_softmax(tf.transpose(e, [0,2,1]), sequence_len), self._X1_conv, name='alpha2')
-            
+        
+        '''
         with tf.name_scope('self_attention1'):
             e_X1 = tf.layers.dense(self._X1_caps, _attention_output_size, activation=tf.nn.relu, name='attention_nn1')
             
@@ -163,9 +168,11 @@ class AttentionCapsnn(BaseSiameseNet):
             
             self._alpha1 = tf.matmul(self._masked_softmax(e, sequence_len), self._X2_conv, name='beta2')
             
+        '''
+            
         with tf.name_scope('comparison_layer'):
             X1_comp = tf.layers.dense(
-                tf.concat([self._X1_caps, self._beta, self._beta1], 2),
+                tf.concat([self._X1_caps, self._beta], 2),
                 _comparison_output_size,
                 activation=tf.nn.relu,
                 name='comparison_nn'
@@ -176,7 +183,7 @@ class AttentionCapsnn(BaseSiameseNet):
             )
             
             X2_comp = tf.layers.dense(
-                tf.concat([self._X2_caps, self._alpha,self._alpha1], 2),
+                tf.concat([self._X2_caps, self._alpha], 2),
                 _comparison_output_size,
                 activation=tf.nn.relu,
                 name='comparison_nn',

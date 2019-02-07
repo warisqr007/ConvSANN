@@ -138,11 +138,11 @@ class AttentionCapsnn(BaseSiameseNet):
             
         with tf.name_scope('attention_layer'):
             #e_X1 = tf.layers.dense(self._X1_caps, _attention_output_size, activation=tf.nn.relu, name='attention_nn')
-            e_X1 = lambda(lambda x: K.sqrt(K.sum(K.square(x), 2)), output_shape=(_attention_output_size,))(self._X1_caps)
+            e_X1 = Lambda(lambda x: K.sqrt(K.sum(K.square(x), 2)), output_shape=(_attention_output_size,))(self._X1_caps)
             
             #e_X2 = tf.layers.dense(self._X2_caps, _attention_output_size, activation=tf.nn.relu, name='attention_nn', reuse=True)
             
-            e_X2 = lambda(lambda x: K.sqrt(K.sum(K.square(x), 2)), output_shape=(_attention_output_size,))(self._X2_caps)
+            e_X2 = Lambda(lambda x: K.sqrt(K.sum(K.square(x), 2)), output_shape=(_attention_output_size,))(self._X2_caps)
             
             e = tf.matmul(e_X1, e_X2, transpose_b=True, name='e')
             

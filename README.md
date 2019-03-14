@@ -1,7 +1,9 @@
 ![](https://img.shields.io/badge/Python-3.6-blue.svg) ![](https://img.shields.io/badge/TensorFlow-1.5.0-blue.svg) ![](https://img.shields.io/badge/License-MIT-blue.svg)
 
-# Siamese Deep Neural Networks for semantic similarity.
-This repository contains implementation of Siamese Neural Networks in Tensorflow built based on 3 different and major deep learning architectures:
+# Self-Attentive Convolution Neural Networks for semantic similarity.
+This repository contains implementation of Self-Attentive Convolution Neural Networks in Tensorflow.
+
+built based on 3 different and major deep learning architectures:
 - Convolutional Neural Networks
 - Recurrent Neural Networks
 - Multihead Attention Networks

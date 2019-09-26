@@ -13,7 +13,13 @@ class BaseSiameseNet:
         self.labels = tf.placeholder(dtype=tf.int32, shape=[None, 1])
         self.sentences_lengths = tf.placeholder(dtype=tf.int32, shape=[None])
         self.dropout = 0.2
-
+        
+        self.dim_kb = 5
+        self.kb_x1 = tf.placeholder(dtype=tf.float32, shape=[max_sequence_len, None, max_sequence_len, self.dim_kb])
+        self.kb_x2 = tf.placeholder(dtype=tf.float32, shape=[max_sequence_len, None, max_sequence_len, self.dim_kb])
+        self.kb_att = tf.placeholder(dtype=tf.float32, shape=[max_sequence_len, None, max_sequence_len])
+        
+        
         self.debug = None
 
         self.embedding_size = main_cfg['PARAMS'].getint('embedding_size')

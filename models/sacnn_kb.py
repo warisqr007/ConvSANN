@@ -48,7 +48,6 @@ class AttentionSCnn(BaseSiameseNet):
         _conv_filter_size = 3
         self.attention_lambda = 0
         
-        
         #parse_list(model_cfg['PARAMS']['filter_sizes'])
         with tf.name_scope('convolutional_layer'):
             X1_conv_1 = tf.layers.conv1d(
@@ -73,6 +72,7 @@ class AttentionSCnn(BaseSiameseNet):
             X1_conv_1 = tf.layers.dropout(X1_conv_1, rate=self.dropout, training=self.is_training)
             X2_conv_1 = tf.layers.dropout(X2_conv_1, rate=self.dropout, training=self.is_training)
             
+            
             X1_conv_2 = tf.layers.conv1d(
                 self._conv_pad(X1_conv_1),
                 _conv_projection_size,
@@ -94,22 +94,22 @@ class AttentionSCnn(BaseSiameseNet):
             
             self._X1_conv = tf.layers.dropout(X1_conv_2, rate=self.dropout, training=self.is_training)
             self._X2_conv = tf.layers.dropout(X2_conv_2, rate=self.dropout, training=self.is_training)
-        
-        
-        #TO DO {KB INSERT HERE}
-        
-        
-        
+            
         
         with tf.name_scope('attention_layer'):
             e_X1 = tf.layers.dense(self._X1_conv, _attention_output_size, activation=tf.nn.relu, name='attention_nn')
             
             e_X2 = tf.layers.dense(self._X2_conv, _attention_output_size, activation=tf.nn.relu, name='attention_nn', reuse=True)
             
-            e = tf.matmul(e_X1, e_X2, transpose_b=True, name='e')
+            self.weight_kb = tf.transpose(self.kb_att, [1, 0, 2])
+            e = tf.matmul(e_X1, e_X2, transpose_b=True, name='e') + self.attention_lambda * self.weight_kb
             
             self._beta = tf.matmul(self._masked_softmax(e, sequence_len), self._X2_conv, name='beta2')
             self._alpha = tf.matmul(self._masked_softmax(tf.transpose(e, [0,2,1]), sequence_len), self._X1_conv, name='alpha2')
+        
+        with tf.name_scope('kb_layer'):
+            #self.ctx2_kb = tf.matmul(tf.transpose(self.kb_x2, [2,0,1,3]), tf.expand_dims(tf.transpose(self._alpha, 
+            
             
         with tf.name_scope('self_attention1'):
             e_X1 = tf.layers.dense(self._X1_conv, _attention_output_size, activation=tf.nn.relu, name='attention_nn1')

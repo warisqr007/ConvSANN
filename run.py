@@ -14,8 +14,33 @@ from utils.model_evaluator import ModelEvaluator
 from utils.model_saver import ModelSaver
 from utils.other_utils import timer, set_visible_gpu, init_config
 
+def get_knowledge_base_matrix(sentence1_batch, sentence2_batch, labels_batch, batch_size, max_sentence_len, kb_dict):
+    kb_x = numpy.zeros((max_sentence_len, batch_size, max_sentence_len, 5)).astype('float32')  #dim_kb=5
+    kb_y = numpy.zeros((max_sentence_len, batch_size, max_sentence_len, 5)).astype('float32')
+    kb_att = numpy.zeros((max_sentence_len, batch_size, max_sentence_len)).astype('float32')
 
-def train(main_config, model_config, model_name, dataset_name):
+    for idx, [s_xl, s_yl, ll] in enumerate(zip(sentence1_batch, sentence2_batch, labels_batch)):
+        for sid, s in enumerate(s_xl):
+            for tid, t in enumerate(s_yl):
+                if s in kb_dict:
+                    if t in kb_dict[s]:
+                        kb_x[sid, idx, tid, :] = numpy.array(kb_dict[s][t]).astype('float32')
+                        kb_att[sid, idx, tid] = 1.
+
+        for sid, s in enumerate(s_yl):
+            for tid, t in enumerate(s_xl):
+                if s in kb_dict:
+                    if t in kb_dict[s]:
+                        kb_y[sid, idx, tid, :] = numpy.array(kb_dict[s][t]).astype('float32')
+    
+    return kb_x, kb_y, kb_att
+
+def train(main_config, model_config, model_name, dataset_name, kb_dict_f):
+    
+    print('Loading knowledge base ...')
+    with open(kb_dict_f,'rb') as f:
+        kb_dict = pkl.load(f)
+    
     main_cfg = MainConfig(main_config)
     model = MODELS[model_name]
     dataset = DATASETS[dataset_name]()
@@ -31,10 +56,12 @@ def train(main_config, model_config, model_name, dataset_name):
     vocabulary_size = vectorizer.vocabulary_size
 
     train_mini_sen1, train_mini_sen2, train_mini_labels = dataset_helper.pick_train_mini_batch()
+    train_mini_kb_x, train_mini_kb_y, train_mini_kb_att = get_knowledge_base_matrix(train_mini_sen1, train_mini_sen2, train_mini_labels, len(train_mini_labels), max_sentence_len, kb_dict)
     train_mini_labels = train_mini_labels.reshape(-1, 1)
 
     test_sentence1, test_sentence2 = dataset_helper.test_instances()
     test_labels = dataset_helper.test_labels()
+    test_kb_x, test_kb_y, test_kb_att = get_knowledge_base_matrix(test_sentence1, test_sentence2, test_labels, len(test_labels), max_sentence_len, kb_dict)
     test_labels = test_labels.reshape(-1, 1)
 
     num_batches = dataset_helper.num_batches
@@ -61,23 +88,31 @@ def train(main_config, model_config, model_name, dataset_name):
 
             # small eval set for measuring dev accuracy
             dev_sentence1, dev_sentence2, dev_labels = dataset_helper.dev_instances()
+            dev_kb_x, dev_kb_y, dev_kb_att = get_knowledge_base_matrix(dev_sentence1, dev_sentence2, dev_labels, len(dev_labels), max_sentence_len, kb_dict)
             dev_labels = dev_labels.reshape(-1, 1)
 
             tqdm_iter = tqdm(range(num_batches), total=num_batches, desc="Batches", leave=False, postfix=metrics)
             for batch in tqdm_iter:
                 global_step += 1
                 sentence1_batch, sentence2_batch, labels_batch = train_batch_helper.next(batch)
+                kb_x, kb_y, kb_att = get_knowledge_base_matrix(sentence1_batch, sentence2_batch, labels_batch, len(labels_batch), max_sentence_len, kb_dict)
                 feed_dict_train = {model.x1: sentence1_batch,
                                    model.x2: sentence2_batch,
                                    model.is_training: True,
-                                   model.labels: labels_batch}
+                                   model.labels: labels_batch,
+                                   model.kb_x: kb_x,
+                                   model.kb_y: kb_y,
+                                   model.kb_att: kb_att}
                 loss, _ = session.run([model.loss, model.opt], feed_dict=feed_dict_train)
 
                 if batch % main_cfg.eval_every == 0:
                     feed_dict_train = {model.x1: train_mini_sen1,
                                      model.x2: train_mini_sen2,
                                      model.is_training: False,
-                                     model.labels: train_mini_labels}
+                                     model.labels: train_mini_labels,
+                                     model.kb_x: train_mini_kb_x,
+                                     model.kb_y: train_mini_kb_y,
+                                     model.kb_att: train_mini_kb_att}
 
                     train_accuracy, train_summary = session.run([model.accuracy, model.summary_op],
                                                                 feed_dict=feed_dict_train)
@@ -86,7 +121,10 @@ def train(main_config, model_config, model_name, dataset_name):
                     feed_dict_dev = {model.x1: dev_sentence1,
                                      model.x2: dev_sentence2,
                                      model.is_training: False,
-                                     model.labels: dev_labels}
+                                     model.labels: dev_labels,
+                                     model.kb_x: dev_mini_kb_x,
+                                     model.kb_y: dev_mini_kb_y,
+                                     model.kb_att: dev_mini_kb_att}
 
                     dev_accuracy, dev_summary = session.run([model.accuracy, model.summary_op],
                                                             feed_dict=feed_dict_dev)
@@ -149,7 +187,7 @@ def main():
                         help='pipeline mode')
 
     parser.add_argument('model',
-                        choices=['rnn', 'cnn', 'multihead', 'bcann', 'bcsann', 'bcsannwmh', 'twolayerbcnn', 'capsann', 'capsnn'],
+                        choices=['rnn', 'cnn', 'multihead', 'bcann', 'bcsann', 'bcsannwmh', 'twolayerbcnn', 'capsann', 'capsnn', 'sacnn_kb'],
                         help='model to be used')
 
     parser.add_argument('dataset',

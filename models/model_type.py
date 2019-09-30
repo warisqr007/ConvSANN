@@ -8,6 +8,7 @@ from models.bcsann_wmh import AttentionSCnnWMH
 from models.twolayerbcnn import Attention2lyrCnn
 from models.capsann import AttentionSCapnn
 from models.capsnn import AttentionCapsnn
+from models.sacnn_kb import AttentionSacnnKb
 
 
 class ModelType(Enum):
@@ -19,7 +20,8 @@ class ModelType(Enum):
     bcsannwmh = 5,
     twolayerbcnn=6,
     capsann = 7,
-    capsnn = 8
+    capsnn = 8,
+    sacnn_kb = 9
 
 
 MODELS = {
@@ -31,7 +33,8 @@ MODELS = {
     ModelType.bcsannwmh.name: AttentionSCnnWMH,
     ModelType.twolayerbcnn.name:Attention2lyrCnn,
     ModelType.capsann.name:AttentionSCapnn,
-    ModelType.capsnn.name:AttentionCapsnn
+    ModelType.capsnn.name:AttentionCapsnn,
+    ModelType.sacnn_kb.name:AttentionSacnnKb
     
 }
 

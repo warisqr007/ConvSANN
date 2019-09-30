@@ -107,8 +107,9 @@ class AttentionSCnn(BaseSiameseNet):
             self._beta = tf.matmul(self._masked_softmax(e, sequence_len), self._X2_conv, name='beta2')
             self._alpha = tf.matmul(self._masked_softmax(tf.transpose(e, [0,2,1]), sequence_len), self._X1_conv, name='alpha2')
         
-        with tf.name_scope('kb_layer'):
-            #self.ctx2_kb = tf.matmul(tf.transpose(self.kb_x2, [2,0,1,3]), tf.expand_dims(tf.transpose(self._alpha, 
+        with tf.name_scope('kb_inference'):
+            self.ctx2_kb = tf.matmul(tf.transpose(self.kb_x2, [1,2,0,3]), tf.expand_dims(tf.transpose(self._alpha, [0,2,1]), -1))
+            self.ctx1_kb = tf.matmul(tf.transpose(self.kb_x1, [1,0,2,3]), tf.expand_dims(tf.transpose(self._beta, [0,2,1]), -1))
             
             
         with tf.name_scope('self_attention1'):
@@ -131,7 +132,7 @@ class AttentionSCnn(BaseSiameseNet):
             
         with tf.name_scope('comparison_layer'):
             X1_comp = tf.layers.dense(
-                tf.concat([self._X1_conv, self._beta, self._beta1], 2),
+                tf.concat([self._X1_conv, self._beta, self._beta1, self.ctx1_kb], 2),
                 _comparison_output_size,
                 activation=tf.nn.relu,
                 name='comparison_nn'
@@ -142,7 +143,7 @@ class AttentionSCnn(BaseSiameseNet):
             )
             
             X2_comp = tf.layers.dense(
-                tf.concat([self._X2_conv, self._alpha,self._alpha1], 2),
+                tf.concat([self._X2_conv, self._alpha,self._alpha1, self.ctx1_kb], 2),
                 _comparison_output_size,
                 activation=tf.nn.relu,
                 name='comparison_nn',

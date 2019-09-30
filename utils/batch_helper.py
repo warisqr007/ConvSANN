@@ -1,7 +1,7 @@
 
 class BatchHelper:
 
-    def __init__(self,  x1, x2, labels, batch_size, kb_dict):
+    def __init__(self,  x1, x2, labels, batch_size, max_sentence_len, kb_dict):
         self.x1 = x1
         # self.x1 = self.x1.reshape(-1, 1)
         self.x2 = x2

@@ -207,7 +207,7 @@ def main():
 
     mode = args.mode
     
-    kb_dict_f = '../../data/sequence_and_features/pair_features.pkl'
+    kb_dict_f = 'data/sequence_and_features/pair_features.pkl'
     
     if 'train' in mode:
         train(main_config, model_config, args.model, args.dataset, kb_dict_f)

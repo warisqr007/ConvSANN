@@ -218,8 +218,8 @@ def build_dictionary(filepaths, dst_path, lowercase=False, wordnet=None, remove_
                         word_freqs[w] = 0
                     word_freqs[w] += 1
 
-    words = word_freqs.keys()
-    freqs = word_freqs.values()
+    words = list(word_freqs.keys())
+    freqs = list(word_freqs.values())
 
     sorted_idx = numpy.argsort(freqs)
     sorted_words = [words[ii] for ii in sorted_idx[::-1]]

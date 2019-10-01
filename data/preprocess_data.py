@@ -2,7 +2,7 @@
 import sys
 import os
 import numpy
-import cPickle as pkl
+import _pickle as pkl
 import re
 
 from collections import OrderedDict
@@ -14,7 +14,7 @@ def build_dictionary_wordnet(filepaths, dst_path=None, lowercase=False, remove_p
     id_num_word = OrderedDict()
     count_phrase = 0
     for filepath in filepaths:
-        print 'Processing', filepath
+        print('Processing', filepath)
         with open(filepath, 'r') as f:
             # format: s(100001740,1,'entity',n,1,11).
             for line in f:
@@ -54,10 +54,10 @@ def build_dictionary_wordnet(filepaths, dst_path=None, lowercase=False, remove_p
             pkl.dump(id_word, f)
             pkl.dump(id_num_word, f)
 
-    print 'number of phrases', count_phrase
-    print 'size of word dictionary', len(word_id_num)
-    print 'size of synset_id dictionary', len(id_word)
-    print 'size of synset_id_num dictionary', len(id_num_word)
+    print ('number of phrases', count_phrase)
+    print ('size of word dictionary', len(word_id_num))
+    print ('size of synset_id dictionary', len(id_word))
+    print ('size of synset_id_num dictionary', len(id_num_word))
 
     return word_id_num, id_word, id_num_word
 
@@ -193,7 +193,7 @@ def features2pkl(feat_path, dict_path, out_path):
     for k, v in bk_for_x.items():
         count+= len(v.keys())
 
-    print 'feature2pkl size', len(bk_for_x.keys()), count
+    print ('feature2pkl size', len(bk_for_x.keys()), count)
 
 dic = {'entailment': '0', 'neutral': '1', 'contradiction': '2'}
 
@@ -207,7 +207,7 @@ def build_dictionary(filepaths, dst_path, lowercase=False, wordnet=None, remove_
         word_freqs[k] = 0
 
     for filepath in filepaths:
-        print 'Processing', filepath
+        print ('Processing', filepath)
         with open(filepath, 'r') as f:
             for line in f:
                 if lowercase:
@@ -236,11 +236,11 @@ def build_dictionary(filepaths, dst_path, lowercase=False, wordnet=None, remove_
     with open(dst_path, 'wb') as f:
         pkl.dump(worddict, f)
 
-    print 'dict size', len(worddict)
+    print ('dict size', len(worddict))
 
 def build_sequence(filepath, dst_dir):
     filename = os.path.basename(filepath)
-    print filename
+    print (filename)
     len_p = []
     len_h = []
     with open(filepath) as f, \
@@ -265,17 +265,17 @@ def build_sequence(filepath, dst_dir):
 
             f3.write(dic[sents[0]] + '\n')
 
-    print 'max min len premise', max(len_p), min(len_p)
-    print 'max min len hypothesis', max(len_h), min(len_h)
+    print ('max min len premise', max(len_p), min(len_p))
+    print ('max min len hypothesis', max(len_h), min(len_h))
 
 
 def CoreNLP(file_path):
     if not os.path.exists('tokenize_and_lemmatize.class'):
-        print 'Compile ...'
+        print ('Compile ...')
         cmd = 'javac -cp "./corenlp/stanford-corenlp-full-2016-10-31/*" tokenize_and_lemmatize.java'
-        print cmd
+        print (cmd)
         os.system(cmd)
-    print 'Run ...'
+    print ('Run ...')
     base_dir = os.path.dirname(file_path)
     base_name = os.path.splitext(os.path.basename(file_path))[0]
     out_name_token = base_name + '_token.txt'
@@ -283,7 +283,7 @@ def CoreNLP(file_path):
     out_name_lemma = base_name + '_lemma.txt'
     out_path_lemma = os.path.join(base_dir, out_name_lemma)
     cmd = 'java -cp ".:./corenlp/stanford-corenlp-full-2016-10-31/*" tokenize_and_lemmatize {} {} {}'.format(file_path, out_path_token, out_path_lemma )
-    print cmd
+    print (cmd)
     os.system(cmd)
 
 def make_dirs(dirs):
@@ -295,7 +295,7 @@ if __name__ == '__main__':
     print('=' * 80)
     print('Preprocessing WordNet prolog and SNLI dataset')
     print('=' * 80)
-    base_dir = os.path.dirname(os.path.realpath(__file__))
+    base_dir = os.path.dirname(os.path.realpath('__file__'))
     dst_dir = os.path.join(base_dir, 'sequence_and_features')
     snli_dir = os.path.join(base_dir, 'snli/snli_1.0')
     wordnet_dir = os.path.join(base_dir, 'wordnet/prolog')
@@ -306,15 +306,15 @@ if __name__ == '__main__':
 
     print('2. obtain relation features\n')
     hypernymy, hyponymy, co_hyponyms = read_hyper_hypo(os.path.join(wordnet_dir, 'wn_hyp.pl'), id_word)
-    print 'hypernymy:', len(hypernymy)
-    print 'hyponymy:', len(hyponymy)
-    print 'co_hyponyms', len(co_hyponyms)
+    print ('hypernymy:', len(hypernymy))
+    print ('hyponymy:', len(hyponymy))
+    print ('co_hyponyms', len(co_hyponyms))
 
     antonymy = read_antony(os.path.join(wordnet_dir, 'wn_ant.pl'), id_num_word, reflexive=False)
-    print 'antonymy:', len(antonymy)
+    print ('antonymy:', len(antonymy))
 
     synonymy = read_synonymy(id_word)
-    print 'synonymy:', len(synonymy)
+    print ('synonymy:', len(synonymy))
 
     features_list = [
                      hypernymy, 
@@ -325,7 +325,7 @@ if __name__ == '__main__':
                      ]
 
     feat_len = len(features_list)
-    print 'relation features dim:', feat_len
+    print ('relation features dim:', feat_len)
 
     print('3. save to readable format (txt)\n')
     w_w_features = OrderedDict()
@@ -339,7 +339,7 @@ if __name__ == '__main__':
 
     feat_path = os.path.join(dst_dir, 'pair_features.txt')
 
-    print 'number of total relation features:', len(w_w_features)
+    print ('number of total relation features:', len(w_w_features))
     with open(feat_path, 'w') as f:
         for k, v in w_w_features.items():
             f.write(k + ' ' + ' '.join(map(str,v.tolist())) + '\n')

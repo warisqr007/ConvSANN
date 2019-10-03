@@ -5,6 +5,7 @@ import tensorflow as tf
 from tqdm import tqdm
 
 import _pickle as pkl
+import numpy as np
 
 from data.dataset import Dataset, DATASETS
 from models.model_type import MODELS

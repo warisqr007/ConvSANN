@@ -171,7 +171,7 @@ def features2pkl(feat_path, dict_path, out_path):
     bk_for_x = {}
     numpy.random.seed(1234)
 
-    with open(feat_path, 'rb') as f1:
+    with open(feat_path, 'r') as f1:
         with open(dict_path, 'rb') as f2:
             worddicts = pkl.load(f2)
             for line in f1:

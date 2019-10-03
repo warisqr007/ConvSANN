@@ -4,6 +4,8 @@ from argparse import ArgumentParser
 import tensorflow as tf
 from tqdm import tqdm
 
+import _pickle as pkl
+
 from data.dataset import Dataset, DATASETS
 from models.model_type import MODELS
 from utils.batch_helper import BatchHelper

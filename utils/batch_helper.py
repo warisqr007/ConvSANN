@@ -14,4 +14,5 @@ class BatchHelper:
         x1_batch = self.x1[batch_id * self.batch_size:(batch_id + 1) * self.batch_size]
         x2_batch = self.x2[batch_id * self.batch_size:(batch_id + 1) * self.batch_size]
         labels_batch = self.labels[batch_id * self.batch_size:(batch_id + 1) * self.batch_size]
+        
         return x1_batch, x2_batch, labels_batch
